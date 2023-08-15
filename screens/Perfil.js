@@ -27,25 +27,30 @@ const Perfil = () =>{
                 title="Editar Pedido"
                 description="Item description"
                 left={props => <List.Icon {...props} icon="file-edit" />}
-            />
-            <List.Item
-                title="Cancelar Pedido"
-                description="Item description"
-                left={props => <List.Icon {...props} icon="file-cancel-outline" />}
+                onPress={() => Navigation.navigate("EditPedido")}
             />
             <List.Item
                 title="Relatorio de Pedidos"
                 description="Item description"
                 left={props => <List.Icon {...props} icon="file-chart" />}
+                onPress={() => Navigation.navigate("Relat")}
+            />
+            <List.Item
+                title="Consultar seu Estoque"
+                description="Item description"
+                left={props => <List.Icon {...props} icon="cow" />}
+                onPress={()=> Navigation.navigate("ConsulEst")}
             />
             <List.Item
                 title="Editar Perfil"
                 description="Item description"
                 left={props => <List.Icon {...props} icon="account-edit-outline" />}
+                onPress={()=> Navigation.navigate("EditPerfil")}
             />
             <List.Item
-            title="Sair"
-            left={props => <List.Icon {...props} icon="logout-variant" />}
+                title="Sair"
+                left={props => <List.Icon {...props} icon="logout-variant" />}
+                onPress={()=> Navigation.goBack}
             />
             </View>
         </View>

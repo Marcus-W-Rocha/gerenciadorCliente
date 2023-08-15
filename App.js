@@ -6,7 +6,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './screens/Login';
 import Perfil from './screens/Perfil';
 import NovoPedido from './screens/NovoPedido';
-
+import EditPerfil from './screens/EditPerfil';
+import EditPedido from './screens/EditPedido';
+import ConsulEst from './screens/ConsulEst';
+import Relat from './screens/Relat';
+import ListaPedidos from './screens/ListaPedidos';
+import DetAbate from './screens/DetAbate';
+import { pt, registerTranslation } from 'react-native-paper-dates'
+registerTranslation("pt",pt)
 
 const Stack = createNativeStackNavigator();
 
@@ -14,10 +21,16 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-    <Stack.Navigator initialRouteName='NovoPedido'>
+    <Stack.Navigator initialRouteName='Perfil'>
       <Stack.Screen name = "Login" component={Login}/>
       <Stack.Screen name = "Perfil" component={Perfil}/>
       <Stack.Screen name = "NovoPedido" component={NovoPedido}/>
+      <Stack.Screen name = "EditPerfil" component={EditPerfil}/>
+      <Stack.Screen name = "EditPedido" component={EditPedido}/>
+      <Stack.Screen name = "ConsulEst" component={ConsulEst}/>
+      <Stack.Screen name = "Relat" component={Relat}/>
+      <Stack.Screen name = "ListaPedidos" component={ListaPedidos}/>
+      <Stack.Screen name = "DetAbate" component={DetAbate}/>
     </Stack.Navigator>
     </NavigationContainer>
   );
