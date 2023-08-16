@@ -25,7 +25,10 @@ const Relat = () =>{
         {
             id:3,
             valor: "Processado"
-
+        },
+        {
+            id:4,
+            valor: "Cancelado"
         }
     ]
     const onDismiss = React.useCallback(() => {
@@ -36,6 +39,8 @@ const Relat = () =>{
         ({ startDate, endDate }) => {
           setOpen(false);
           setRange({ startDate, endDate });
+          Navigation.navigate("ListaPedidos",{requestType:{data:{ startDate, endDate} }, 
+          perfil:Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]})
         },
         [setOpen, setRange]
       );
@@ -65,7 +70,8 @@ const Relat = () =>{
                     title = "Relatorio Geral"
                     description = "Todos os pedidos"
                     left={props => <List.Icon {...props} icon="all-inclusive-box-outline"/>}
-                    onPress={() => Navigation.navigate("ListaPedidos")}/>
+                    onPress={() => Navigation.navigate("ListaPedidos",{requestType:{"Geral":{}},
+                    perfil:Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]})}/>
             </View>
             <DatePickerModal
             locale="pt"
@@ -84,11 +90,11 @@ const Relat = () =>{
                         <List.Item
                             key={listStatus.id}
                             title = {listStatus.valor}
-                            onPress={() => console.log(listStatus.valor)}/>
+                            onPress={() => Navigation.navigate("ListaPedidos",{requestType:{status:listStatus},
+                                perfil:Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]})}/>
                     )})}
                 </Modal>
             </Portal>
-            
         </View>
     )
 }

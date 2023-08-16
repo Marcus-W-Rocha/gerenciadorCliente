@@ -13,7 +13,9 @@ const EditPerfil = () =>{
     const [visible, setVisible] = React.useState(false);
     const [idPedido,setIdPedido] = React.useState(null)
 
-    //recuperar do banco de dados de acordo com o cliente e colocar nesse array
+
+    //enviar para banco de dados status + Enviar, recuperar pedidos com base no IdCliente e o status = "Enviado". Salvar na variavel ListPedidos
+    const Enviar = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]
     const [listPedidos,setListPedidos] = React.useState([
         {
             id: 1,
@@ -37,7 +39,7 @@ const EditPerfil = () =>{
 
         }
     ])
-    //recuperar os detalhes dos pedidos de acordo com os pedidos exibidos (aqueles com status = "enviado")
+    //recuperar os detalhes dos pedidos de acordo com os pedidos da lista (um a um) (aqueles com status = "enviado")
     const detalhesPedido = [
         {
             idDetalhe: 1,
@@ -127,8 +129,6 @@ const EditPerfil = () =>{
             </View>
             <Portal>
                 <Modal visible={visible} onDismiss={hideModalDetalhes} contentContainerStyle={{backgroundColor: 'white', padding: 20}}>
-                    <Text variant="headlineSmall" style={{textAlign: "center"}}>Data</Text>
-                    <Text variant="titleMedium" style={{textAlign: "center"}}>Status</Text>
                     <DataTable>
                         <DataTable.Header>
                             <DataTable.Title>Especie</DataTable.Title>
@@ -142,7 +142,10 @@ const EditPerfil = () =>{
                                     </DataTable.Row>
                                 )})} 
                     </DataTable>
-                    <Button icon="note-edit" mode="contained-tonal" onPress={() => console.log("editar pedido")}>Editar Pedido</Button>
+                    <Button icon="note-edit" mode="contained-tonal" onPress={() => Navigation.navigate("EditScreen",{
+                                                detalhes: detalhesPedido.filter((pedido)=> pedido.idPedido==idPedido),
+                                                idCliente: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]
+                                                })}>Editar Pedido</Button>
                 </Modal>
             </Portal>
 

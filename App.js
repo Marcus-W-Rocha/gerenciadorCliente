@@ -12,6 +12,7 @@ import ConsulEst from './screens/ConsulEst';
 import Relat from './screens/Relat';
 import ListaPedidos from './screens/ListaPedidos';
 import DetAbate from './screens/DetAbate';
+import EditScreen from './screens/EditScreen';
 import { pt, registerTranslation } from 'react-native-paper-dates'
 import md5 from 'md5';
 registerTranslation("pt",pt)
@@ -38,6 +39,7 @@ export default function App() {
       <Stack.Screen name = "Relat" component={Relat}/>
       <Stack.Screen name = "ListaPedidos" component={ListaPedidos}/>
       <Stack.Screen name = "DetAbate" component={DetAbate}/>
+      <Stack.Screen name = "EditScreen" component={EditScreen}/>
     </Stack.Navigator>
     </NavigationContainer>
   );

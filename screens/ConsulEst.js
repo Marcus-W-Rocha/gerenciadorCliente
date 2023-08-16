@@ -7,7 +7,9 @@ import { PaperProvider,Text,Button, DataTable } from "react-native-paper";
 
 const ConsulEst = () =>{ 
     const Navigation = useNavigation();
-    //recueprar estoque da API passando Id de cliente, colocar nesse array
+    const Envio = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]
+    console.log(Envio)
+    //recueprar estoque da API passando Envio, colocar nesse array
     const Estoque =[
         {
             idEstoque: 1,

@@ -7,6 +7,8 @@ import { PaperProvider,Text,List, Portal,Modal,Button, DataTable } from "react-n
 
 const DetAbate = () =>{ 
     const Navigation = useNavigation();
+    const Envio = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]
+    //envio deve ser enviado para a api para recuperar todos os abates com o id do pedido. Esse valor deve ser entao colocado em listAbates
     const listAbates = [
         {
         idAbate: 1,
