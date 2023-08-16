@@ -56,7 +56,7 @@ const Perfil = () =>{
             <List.Item
                 title="Sair"
                 left={props => <List.Icon {...props} icon="logout-variant" />}
-                onPress={()=> Navigation.goBack}
+                onPress={()=> Navigation.navigate("Login")}
             />
             </View>
         </View>

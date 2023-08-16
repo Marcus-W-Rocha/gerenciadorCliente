@@ -23,15 +23,9 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-    <Stack.Navigator initialRouteName='Perfil'>
+    <Stack.Navigator initialRouteName='Login'>
       <Stack.Screen name = "Login" component={Login}/>
-      <Stack.Screen name = "Perfil" component={Perfil} initialParams={{
-          idCliente: 1,
-          nomeEmpresa: "Empresa Teste",
-          nomeRepresentante: "Representante Teste",
-          contatoRepre: "86995157777",
-          senha: md5("12345678")}
-      }/>
+      <Stack.Screen name = "Perfil" component={Perfil}/>
       <Stack.Screen name = "NovoPedido" component={NovoPedido}/>
       <Stack.Screen name = "EditPerfil" component={EditPerfil}/>
       <Stack.Screen name = "EditPedido" component={EditPedido}/>
