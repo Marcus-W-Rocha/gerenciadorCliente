@@ -2,37 +2,42 @@ import React, { useState } from "react";
 import { View, StyleSheet, TouchableOpacity} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text,List, Portal,Modal,Button, DataTable } from "react-native-paper";
+import ListaPedidos from "./ListaPedidos";
 
 
 
 const EditPerfil = () =>{ 
     const Navigation = useNavigation();
-    const showModalDetalhes = () => setVisible(true);
     const hideModalDetalhes = () => setVisible(false);
+    const showModalDetalhes = () =>setVisible(true);
     const [visible, setVisible] = React.useState(false);
-    const listPedidos = [
+    const [idPedido,setIdPedido] = React.useState(null)
+
+    //recuperar do banco de dados de acordo com o cliente e colocar nesse array
+    const [listPedidos,setListPedidos] = React.useState([
         {
             id: 1,
             idCliente: 1,
-            dataPedido: "13/08/2022",
+            dataPedido: "13-08-2022",
             status: "Enviado",
 
         },
         {
             id: 2,
             idCliente: 1,
-            dataPedido: "14/08/2022",
-            status: "Enviado",
+            dataPedido: "14-08-2022",
+            status: "Processado",
 
         },
         {
             id: 3,
             idCliente: 1,
-            dataPedido: "15/08/2022",
+            dataPedido: "15-08-2022",
             status: "Enviado",
 
         }
-    ]
+    ])
+    //recuperar os detalhes dos pedidos de acordo com os pedidos exibidos (aqueles com status = "enviado")
     const detalhesPedido = [
         {
             idDetalhe: 1,
@@ -55,8 +60,51 @@ const EditPerfil = () =>{
             quantidade: 1,
 
         },
+        {
+            idDetalhe: 4,
+            idPedido: 2,
+            tipoAnimal: "Bovino",
+            quantidade: 1,
+
+        },
+        {
+            idDetalhe: 5,
+            idPedido: 2,
+            tipoAnimal: "Ovino",
+            quantidade: 2,
+
+        },
+        {
+            idDetalhe: 6,
+            idPedido: 3,
+            tipoAnimal: "Ovino",
+            quantidade: 12,
+
+        },
 
     ]
+
+    const abrirModal = (id) =>{
+        setIdPedido(id)
+        showModalDetalhes()
+    }
+    
+    const deletePedido = (pedidoR) =>{
+        const editedList = [...listPedidos]
+        pedidoEditado = {
+            dataPedido: pedidoR.dataPedido,
+            status: "Cancelado"
+        }//passa com id para api com uma chamada de alterar pedido
+        for(var a = 0;a<editedList.length;a++){
+            if (editedList[a].id == pedidoR.id){
+                editedList[a].status = "Cancelado"
+                console.log(editedList)
+            }
+        }
+        setListPedidos(editedList)
+        console.log("testeDelete")
+    }
+
     return (
         <View>
             <View style={{marginTop:10 }}>
@@ -65,17 +113,17 @@ const EditPerfil = () =>{
             </View>
             <View style={{ height:"2%", backgroundColor: "black",marginTop:10 }}/>
             <View>
-            {listPedidos.map((listPedidos)=>{
-                return (
-                    <List.Item
-                        key={listPedidos.id}
-                        title = {listPedidos.dataPedido}
-                        description = {listPedidos.status}
-                        right={props => <TouchableOpacity onPress={() => console.log('delete')}>
-                                            <List.Icon icon="delete-circle"/>
-                                        </TouchableOpacity>}
-                        onPress={showModalDetalhes}/>
-                )})}
+            {listPedidos.filter((value)=>value.status=="Enviado").map((pedidos)=>{
+                    return (
+                        <List.Item
+                            key={pedidos.id}
+                            title = {pedidos.dataPedido}
+                            description = {pedidos.status}
+                            right={props => <TouchableOpacity onPress={() => deletePedido(pedidos)}>
+                                                <List.Icon icon="delete-circle"/>
+                                            </TouchableOpacity>}
+                            onPress={() => abrirModal(pedidos.id)}/>
+                    )})}
             </View>
             <Portal>
                 <Modal visible={visible} onDismiss={hideModalDetalhes} contentContainerStyle={{backgroundColor: 'white', padding: 20}}>
@@ -85,16 +133,12 @@ const EditPerfil = () =>{
                         <DataTable.Header>
                             <DataTable.Title>Especie</DataTable.Title>
                             <DataTable.Title numeric>Quantidade</DataTable.Title>
-                            <DataTable.Title numeric>Editar</DataTable.Title>
-                            <DataTable.Title numeric>Excluir</DataTable.Title>
                         </DataTable.Header>
-                            {detalhesPedido.map((detalhesPedido)=>{
+                            {detalhesPedido.filter((pedido)=> pedido.idPedido==idPedido).map((detalhesPedido)=>{ 
                                 return (
                                     <DataTable.Row key={detalhesPedido.idDetalhe}>
                                         <DataTable.Cell>{detalhesPedido.tipoAnimal}</DataTable.Cell>
                                         <DataTable.Cell numeric>{detalhesPedido.quantidade}</DataTable.Cell>
-                                        <DataTable.Cell numeric>{<Button icon="pencil" />}</DataTable.Cell>
-                                        <DataTable.Cell numeric>{<Button icon="alpha-x" />}</DataTable.Cell>
                                     </DataTable.Row>
                                 )})} 
                     </DataTable>
@@ -105,10 +149,6 @@ const EditPerfil = () =>{
         </View>
     )
 }
-const styles = StyleSheet.create({
-
-
-})
 
 export default () => (
     <PaperProvider>

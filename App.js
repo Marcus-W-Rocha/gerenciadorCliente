@@ -13,6 +13,7 @@ import Relat from './screens/Relat';
 import ListaPedidos from './screens/ListaPedidos';
 import DetAbate from './screens/DetAbate';
 import { pt, registerTranslation } from 'react-native-paper-dates'
+import md5 from 'md5';
 registerTranslation("pt",pt)
 
 const Stack = createNativeStackNavigator();
@@ -23,7 +24,13 @@ export default function App() {
     <NavigationContainer>
     <Stack.Navigator initialRouteName='Perfil'>
       <Stack.Screen name = "Login" component={Login}/>
-      <Stack.Screen name = "Perfil" component={Perfil}/>
+      <Stack.Screen name = "Perfil" component={Perfil} initialParams={{
+          idCliente: 1,
+          nomeEmpresa: "Empresa Teste",
+          nomeRepresentante: "Representante Teste",
+          contatoRepre: "86995157777",
+          senha: md5("12345678")}
+      }/>
       <Stack.Screen name = "NovoPedido" component={NovoPedido}/>
       <Stack.Screen name = "EditPerfil" component={EditPerfil}/>
       <Stack.Screen name = "EditPedido" component={EditPedido}/>
