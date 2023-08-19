@@ -14,22 +14,22 @@ const DetAbate = () =>{
         idAbate: 1,
         idPedidos: 1,
         TipoAnimal: "Bovino",
-        peso: 15,
-        viabilidade: true,
+        peso: "15",
+        condenações: true,
         },
         {
             idAbate:2,
             idPedidos: 1,
             TipoAnimal: "Suino",
-            peso: 10,
-            viabilidade: true,
+            peso: "10",
+            condenações: true,
         },
         {
             idAbate: 3,
             idPedidos: 1,
             TipoAnimal: "ovino",
-            peso: 5,
-            viabilidade: false,
+            peso: "5,10",
+            condenações: false,
         },
     ]
 
@@ -44,14 +44,14 @@ const DetAbate = () =>{
                     <DataTable.Header>
                             <DataTable.Title>Especie</DataTable.Title>
                             <DataTable.Title numeric>peso</DataTable.Title>
-                            <DataTable.Title numeric>viabilidade</DataTable.Title>
+                            <DataTable.Title numeric>condenações</DataTable.Title>
                         </DataTable.Header>
                             {listAbates.map((listAbates)=>{
                                 return (
                                     <DataTable.Row key={listAbates.idAbate}>
                                         <DataTable.Cell>{listAbates.TipoAnimal}</DataTable.Cell>
                                         <DataTable.Cell numeric>{listAbates.peso}</DataTable.Cell>
-                                        <DataTable.Cell numeric>{listAbates.viabilidade==true ? <Text>Viavel</Text>: <Text>Nao Viavel</Text>}</DataTable.Cell>
+                                        <DataTable.Cell numeric>{listAbates.condenações}</DataTable.Cell>
                                     </DataTable.Row>
                                 )})}   
                     </DataTable>

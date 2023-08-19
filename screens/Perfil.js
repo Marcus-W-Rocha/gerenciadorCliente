@@ -2,7 +2,6 @@ import * as React from "react";
 import { View,  } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider, Text, List } from "react-native-paper";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //perfil atual recuperado do banco de dados
 
