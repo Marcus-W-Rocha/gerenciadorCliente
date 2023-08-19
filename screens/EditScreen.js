@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { View, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text,Button, DataTable, TextInput, Modal, List, Portal} from "react-native-paper";
-import { TouchableOpacity } from "react-native";
-import DropDown from "react-native-paper-dropdown";
-import ListaPedidos from "./ListaPedidos";
+
 
 
 const EditScreen = () =>{ 

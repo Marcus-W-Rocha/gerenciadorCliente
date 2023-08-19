@@ -3,8 +3,9 @@ import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text, Button, TextInput, HelperText } from "react-native-paper";
 import md5 from "md5";
-import Perfil from "./Perfil";
 import { Alert } from "react-native";
+import axios from "axios";
+import {URLBase} from "../const"
 
 const Login =() => {
     const Navigation = useNavigation();
@@ -12,29 +13,35 @@ const Login =() => {
     const [valueSenha, setValueSenha] = React.useState('')
     const [secureTextEntry,setSecureTextEntry] = React.useState(true)
 
+    
+
     const toggleSecurity = () => {
         setSecureTextEntry(!secureTextEntry)
     }
 
-    const Login = () =>{
+    const LoginAuth = async () =>{
+
+
+
         log = {
             user:user,
             senha:md5(valueSenha)
         }
+        const response = await axios.post(`${URLBase}/clientes/login`,log)
+        console.log(response.data)
         //esses dados devem ser enviados para o banco de dados e seu retorno deve ser colocado numa variavel token,
        //caso o token seja valido devera fazer-se
-       const token = true
-       const PerfilAtual = {//deve-se recuperar os dados do cliente de acordo com o token (e seu id)
-            idCliente: 1,
-            nomeEmpresa: "Empresa Teste",
-            nomeRepresentante: "Representante Teste",
-            contatoRepre: "86995157777",
-            senha: md5("12345678")}
-       
-       
-       if (token){
-        Navigation.navigate("Perfil",PerfilAtual)
-       }
+       if (response.data != "Credenciais Invalidas"){
+            const PerfilAtual = {//deve-se recuperar os dados do cliente de acordo com o token (e seu id)
+                idCliente: response.data[0],
+                nomeEmpresa: response.data[1],
+                nomeRepresentante: response.data[2],
+                contatoRepre: response.data[3],
+                user: response.data[4],
+                token: response.data[5]
+            }
+            Navigation.navigate("Perfil",PerfilAtual)
+       }       
        else{
         Alert.alert(
             'Error',
@@ -44,6 +51,7 @@ const Login =() => {
             ],
           );
        }
+
     }
 
     return (
@@ -70,7 +78,7 @@ const Login =() => {
                 {(valueSenha.length!=0 && valueSenha.length<6) && <HelperText type="error">Senha Invalida</HelperText>}
             </View>
             <View>
-            <Button icon="login-variant" mode="contained-tonal" onPress={() => Login()}>Entrar</Button>
+            <Button icon="login-variant" mode="contained-tonal" onPress={() => LoginAuth()}>Entrar</Button>
             </View>
         </View>
     )

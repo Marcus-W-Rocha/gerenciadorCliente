@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { View, StyleSheet,FlatList, TouchableOpacity} from "react-native";
+import { View} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { PaperProvider,Text,List, Portal,Modal,Button, DataTable } from "react-native-paper";
+import { PaperProvider,Text, DataTable } from "react-native-paper";
 
 
 

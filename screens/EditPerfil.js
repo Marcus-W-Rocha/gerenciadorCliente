@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider, Button, TextInput, HelperText, Text} from "react-native-paper";
 import md5 from "md5";

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet} from "react-native";
+import { View} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text,List, Modal,Portal} from "react-native-paper";
 import { DatePickerModal } from 'react-native-paper-dates';

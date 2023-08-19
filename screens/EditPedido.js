@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { View, StyleSheet, TouchableOpacity} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text,List, Portal,Modal,Button, DataTable } from "react-native-paper";
-import ListaPedidos from "./ListaPedidos";
-
 
 
 const EditPerfil = () =>{ 
