@@ -3,6 +3,8 @@ import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text, Button, TextInput, Badge,FAB,  Portal,Modal,DataTable, HelperText } from "react-native-paper";
 import DropDown from "react-native-paper-dropdown";
+import axios from "axios";
+import {URLBase} from "../const"
 
 
 const NovoPedido = () =>{
@@ -20,54 +22,51 @@ const NovoPedido = () =>{
     const hideQuantZero= () => setVisibleQuantZero(false);
     const [quantidade, setQuantidade] = React.useState("")
     const [carrinho, setCarrinho] = React.useState([])
+    const [especiesList, setEspeciesList] = React.useState([])
+    const [estoque, setEstoqueList] = React.useState([])
     const [visibleSucess, setvisibleSucess] = React.useState(false);
     const ShowSucess= () => setvisibleSucess(true);
     const hideSucess= () => setvisibleSucess(false);
     const [visibleCarrinhoVazio, setvisibleCarrinhoVazio] = React.useState(false);
     const ShowCarrinhoVazio= () => setvisibleCarrinhoVazio(true);
     const hideCarrinhoVazio= () => setvisibleCarrinhoVazio(false);
+    const [loaded, setLoaded] = React.useState(false);
 
-    {/* Recupera do BD lista de especie e colocar nesse vetor. 
-    idTipoAnimal INTEGER PRIMARY KEY,
-    especie TEXT NOT NULL*/}
-    
-    const especiesList = [
-        {
-            label:"especie1",
-            value:1
-        },
-        {
-            label: "especie2",
-            value: 2
-        },
-        {
-            label: "especie3",
-            value: 3
-        }
-    ]
+    const perfilAtual = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]
+    const config = {
+        headers: { 'token':perfilAtual.token }
+    };
+    React.useEffect(() =>{
+        callbd = async () => {
+            let response = await axios.get(`${URLBase}/tipoAnimais`,config)
+            responseData = response.data
+            list = []
+            for (let i=0; i <responseData.length; i++){ 
+                a = {
+                    value:responseData[i][0],
+                    label:responseData[i][1]
+                }
+                list.push(a)
+            }
+            response = await axios.get(`${URLBase}/estoque/idc/${perfilAtual.idCliente}`,config)
+            responseData = response.data
+            list1 = []
+            for (let i=0; i <responseData.length; i++){ 
+                a = {
+                    idEstoque:responseData[i][0],
+                    idCliente:responseData[i][1],
+                    idTipoAnimal: responseData[i][2],
+                    quantidade: responseData[i][3]
+                }
+                list1.push(a)
+            }
+            setLoaded(true)
+            setEspeciesList(list)
+            setEstoqueList(list1)
 
-    {/*Recuperar do bd estoque do cliente e colcoar nesse vetor
-    */}
-    const estoque = [
-        {
-            idEstoque: 1,
-            idCliente:1,
-            idTipoAnimal:1,
-            quantidade:4
-        },
-        {
-            idEstoque: 2,
-            idCliente:1,
-            idTipoAnimal:2,
-            quantidade:6
-        },
-        {
-            idEstoque: 3,
-            idCliente:1,
-            idTipoAnimal:3,
-            quantidade:9
-        }
-    ]
+        }     
+        if(loaded==false){callbd()}
+    }) 
 
     const addCart = (quantidade,especie) =>{
         hideEstInsufi()
@@ -125,7 +124,7 @@ const NovoPedido = () =>{
         });
     }
 
-    const enviarPedido = () =>{
+    const enviarPedido = async() =>{
         if (carrinho ==[]){
             ShowCarrinhoVazio()
             return
@@ -142,20 +141,22 @@ const NovoPedido = () =>{
             }
             const pedido = {
                 idCliente:Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"],
-                dataPedido: `${month}-${day}-${year}`,
+                dataPedido: `${year}-${month}-${day}`,
                 status:"Enviado"
             }
-            console.log(pedido)
-            // enviar o objeto pedido para o banco de dados e esperar o retorno do idPedido
+            let response = await axios.post(`${URLBase}/pedidos`,pedido,config)
+
+            let list2 = []
             carrinho.forEach(elementCarrinho => {
                 const detalhesPedido ={
-                    idPedido: "a Definir",
+                    idPedido: response.data[0][0],
                     idTipoAnimal: elementCarrinho.idTipoAnimal,
                     quantidade: elementCarrinho.quantidade
                 }
-                console.log(detalhesPedido)
-                //enviar para banco de dados
+                list2.push(detalhesPedido)
             });
+            response = await axios.post(`${URLBase}/detalhesPedido/`,list2,config)
+
             setCarrinho([])
             setEspecies("")
             setQuantidade("")

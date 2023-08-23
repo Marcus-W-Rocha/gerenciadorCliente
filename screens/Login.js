@@ -20,19 +20,13 @@ const Login =() => {
     }
 
     const LoginAuth = async () =>{
-
-
-
         log = {
             user:user,
             senha:md5(valueSenha)
         }
         const response = await axios.post(`${URLBase}/clientes/login`,log)
-        console.log(response.data)
-        //esses dados devem ser enviados para o banco de dados e seu retorno deve ser colocado numa variavel token,
-       //caso o token seja valido devera fazer-se
        if (response.data != "Credenciais Invalidas"){
-            const PerfilAtual = {//deve-se recuperar os dados do cliente de acordo com o token (e seu id)
+            const PerfilAtual = {
                 idCliente: response.data[0],
                 nomeEmpresa: response.data[1],
                 nomeRepresentante: response.data[2],

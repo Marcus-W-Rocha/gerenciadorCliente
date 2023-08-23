@@ -39,7 +39,7 @@ const Relat = () =>{
         ({ startDate, endDate }) => {
           setOpen(false);
           setRange({ startDate, endDate });
-          Navigation.navigate("ListaPedidos",{requestType:{data:{ startDate, endDate} }, 
+          Navigation.navigate("ListaPedidos",{requestType:{Data:{ startDate, endDate} }, 
           perfil:Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]})
         },
         [setOpen, setRange]
@@ -90,7 +90,7 @@ const Relat = () =>{
                         <List.Item
                             key={listStatus.id}
                             title = {listStatus.valor}
-                            onPress={() => Navigation.navigate("ListaPedidos",{requestType:{status:listStatus},
+                            onPress={() => Navigation.navigate("ListaPedidos",{requestType:{Status:listStatus},
                                 perfil:Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]})}/>
                     )})}
                 </Modal>

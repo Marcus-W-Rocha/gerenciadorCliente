@@ -3,6 +3,8 @@ import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider, Button, TextInput, HelperText, Text} from "react-native-paper";
 import md5 from "md5";
+import axios from "axios";
+import {URLBase} from "../const"
 
 const EditPerfil = () =>{ 
     const Navigation = useNavigation();
@@ -14,6 +16,9 @@ const EditPerfil = () =>{
     const [valueConfSenha, setValueConfSenha] = React.useState('')
     const [secureTextEntry,setSecureTextEntry] = React.useState(true)
     const [secureTextEntryConf,setSecureTextEntryConfirm] = React.useState(true)
+    const config = {
+        headers: { 'token':perfilAtual.token }
+    };
     
     const toggleSecurity = () => {
         setSecureTextEntry(!secureTextEntry)
@@ -32,22 +37,23 @@ const EditPerfil = () =>{
         return false
     }
 
-    const PerfilEditado = () => {
+    const PerfilEditado = async () => {
         if (represent.length<=5 || vericLetras(contato)||contato.length!=11 
         || valueSenha.length <5 || valueConfSenha!=valueSenha){
             return
         }
-        const perfilEnviar ={//esse dado eh enviado ao banco de dados junto com o id de cliente para editar o perfil.
+        const perfilEnviar ={
             nomeRepresentante: represent,
             contatoRepre: contato,
             senha: md5(valueSenha)
         }
+        let response = await axios.put(`${URLBase}/clientes/idc/${perfilAtual.idCliente}`,perfilEnviar,config)
+        response = response.data
         Navigation.navigate("Perfil",{
             idCliente: perfilAtual.idCliente,
             nomeEmpresa: perfilAtual.nomeEmpresa,
-            nomeRepresentante: represent,
-            contatoRepre: contato,
-            senha: md5(valueSenha)}
+            nomeRepresentante: perfilEnviar.nomeRepresentante,
+            contatoRepre: perfilEnviar.contatoRepre}
         )
 
     }
@@ -60,8 +66,6 @@ const EditPerfil = () =>{
             </View>
             <View style={{ height:"2%", backgroundColor: "black",marginTop:10 }}/>
             <View>
-                {/* <TextInput label={"Nome Empresa"} value={user} onChangeText={user => setValue(user)}/>
-                <HelperText type="error">Nome Empresa Invalido</HelperText> */}
                 <TextInput label={"Nome Representante"}  value={represent} onChangeText={represent => setRepresent(represent)}/>
                 {(represent.length>0 && represent.length<=5) && <HelperText type="error" visible={true}>Nome Representante Invalido</HelperText>}
                 <TextInput keyboardType='phone-pad' label={"Contato Representante"}  value={contato} onChangeText={contato => setContato(contato)}/>

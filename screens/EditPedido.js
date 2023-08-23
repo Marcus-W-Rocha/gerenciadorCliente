@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { View, StyleSheet, TouchableOpacity} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text,List, Portal,Modal,Button, DataTable } from "react-native-paper";
+import axios from "axios";
+import {URLBase} from "../const"
 
 
 const EditPerfil = () =>{ 
@@ -10,99 +12,108 @@ const EditPerfil = () =>{
     const showModalDetalhes = () =>setVisible(true);
     const [visible, setVisible] = React.useState(false);
     const [idPedido,setIdPedido] = React.useState(null)
-
+    const [loaded,setLoaded] = React.useState(false)
+    const [listPedidos,setListPedidos] = React.useState([])
+    const [detalhesPedido,setDetalhesPedido] = React.useState([])
+    const [listEspecies,setListEspecies] = React.useState([])
+    const [loadedlistEspecies,setLoadedListEspecies] = React.useState(false)
 
     //enviar para banco de dados status + Enviar, recuperar pedidos com base no IdCliente e o status = "Enviado". Salvar na variavel ListPedidos
-    const Enviar = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]
-    const [listPedidos,setListPedidos] = React.useState([
-        {
-            id: 1,
-            idCliente: 1,
-            dataPedido: "13-08-2022",
-            status: "Enviado",
+    const perfilAtual = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]
+    const config = {
+        headers: { 'token':perfilAtual.token }
+    };
+    
+    React.useEffect(() => {
+        callbd = async () =>{
+            let response = await axios.post(`${URLBase}/pedidos/status/Enviado`,{idCliente: perfilAtual.idCliente}, config)
+            response = response.data
+            let list = []
+            let listId = []
+            response.forEach(element => {
+                let data = new Date(element[2]*1000).toLocaleDateString("pt")
+                a = {
+                    id: element[0],
+                    idCliente: element[1],
+                    dataPedido: data,
+                    status: element[3],
+                }
+                list.push(a)
+                listId.push(element[0])    
+            });
 
-        },
-        {
-            id: 2,
-            idCliente: 1,
-            dataPedido: "14-08-2022",
-            status: "Processado",
 
-        },
-        {
-            id: 3,
-            idCliente: 1,
-            dataPedido: "15-08-2022",
-            status: "Enviado",
-
+            setListPedidos(list)
+            setLoaded(true)
         }
-    ])
-    //recuperar os detalhes dos pedidos de acordo com os pedidos da lista (um a um) (aqueles com status = "enviado")
-    const detalhesPedido = [
-        {
-            idDetalhe: 1,
-            idPedido: 1,
-            tipoAnimal: "Bovino",
-            quantidade: 3,
+        if (loaded == false) callbd()
 
-        },
-        {
-            idDetalhe: 2,
-            idPedido: 1,
-            tipoAnimal: "Ovino",
-            quantidade: 4,
+    })
 
-        },
-        {
-            idDetalhe: 3,
-            idPedido: 1,
-            tipoAnimal: "Suino",
-            quantidade: 1,
-
-        },
-        {
-            idDetalhe: 4,
-            idPedido: 2,
-            tipoAnimal: "Bovino",
-            quantidade: 1,
-
-        },
-        {
-            idDetalhe: 5,
-            idPedido: 2,
-            tipoAnimal: "Ovino",
-            quantidade: 2,
-
-        },
-        {
-            idDetalhe: 6,
-            idPedido: 3,
-            tipoAnimal: "Ovino",
-            quantidade: 12,
-
-        },
-
-    ]
-
-    const abrirModal = (id) =>{
+    const abrirModal = async (id) =>{
         setIdPedido(id)
+        let response = await axios.get(`${URLBase}/detalhesPedido/idp/${id}`, config) 
+        response = response.data
+        list = []
+        response.forEach(element => {
+            a = {
+                idDetalhe: element[0],
+                idPedido: element[1],
+                tipoAnimal: element[2],
+                quantidade: element[3],
+            }
+            list.push(a)
+        });
+        if (loadedlistEspecies == false){
+            let response = await axios.get(`${URLBase}/tipoAnimais`, config) 
+            response = response.data
+            list2 = []
+            response.forEach(element => {
+                a = {
+                    idAnimal: element[0],
+                    nomeEspecie: element[1]
+                }
+                list2.push(a)
+            });
+        }
+        setLoadedListEspecies(true)
+        setListEspecies(list2)
+        setDetalhesPedido(list)
         showModalDetalhes()
     }
     
-    const deletePedido = (pedidoR) =>{
+    const retIdAni = (id) =>{
+        listEspecies.forEach(element => {
+            if (element["idAnimal"]==id){
+                a = element["nomeEspecie"]
+                return a
+            }
+
+        });
+        return a
+    }
+
+    const deletePedido = async (pedidoR) =>{
         const editedList = [...listPedidos]
+        var date = pedidoR.dataPedido
+        var dia  = date.split("/")[0];
+        var mes  = date.split("/")[1];
+        var ano  = date.split("/")[2];
+        date = ano + '-' + ("0"+mes).slice(-2) + '-' + ("0"+dia).slice(-2)
+
         pedidoEditado = {
-            dataPedido: pedidoR.dataPedido,
+            dataPedido: date,
             status: "Cancelado"
-        }//passa com id para api com uma chamada de alterar pedido
+        }
+        response = await axios.put(`${URLBase}/pedidos/idp/${pedidoR.id}`,pedidoEditado,config)
+        response = response.data
+        console.log(response)
         for(var a = 0;a<editedList.length;a++){
             if (editedList[a].id == pedidoR.id){
                 editedList[a].status = "Cancelado"
-                console.log(editedList)
             }
         }
         setListPedidos(editedList)
-        console.log("testeDelete")
     }
 
     return (
@@ -135,14 +146,14 @@ const EditPerfil = () =>{
                             {detalhesPedido.filter((pedido)=> pedido.idPedido==idPedido).map((detalhesPedido)=>{ 
                                 return (
                                     <DataTable.Row key={detalhesPedido.idDetalhe}>
-                                        <DataTable.Cell>{detalhesPedido.tipoAnimal}</DataTable.Cell>
+                                        <DataTable.Cell>{retIdAni(detalhesPedido.tipoAnimal)}</DataTable.Cell>
                                         <DataTable.Cell numeric>{detalhesPedido.quantidade}</DataTable.Cell>
                                     </DataTable.Row>
                                 )})} 
                     </DataTable>
                     <Button icon="note-edit" mode="contained-tonal" onPress={() => Navigation.navigate("EditScreen",{
                                                 detalhes: detalhesPedido.filter((pedido)=> pedido.idPedido==idPedido),
-                                                idCliente: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]
+                                                idCliente: perfilAtual
                                                 })}>Editar Pedido</Button>
                 </Modal>
             </Portal>

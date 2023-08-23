@@ -2,32 +2,63 @@ import React, { useState } from "react";
 import { View, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text,Button, DataTable } from "react-native-paper";
+import axios from "axios";
+import {URLBase} from "../const"
 
 
 
 const ConsulEst = () =>{ 
     const Navigation = useNavigation();
-    const Envio = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]
-    console.log(Envio)
+    const perfilAtual = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]
+    const [Estoque,setEstoque] = React.useState([])
+    const [tipoAni,setTipoAni] = React.useState([])
+    const [BdLoaded,setBdLoaded] = React.useState(false)
+    const config = {
+        headers: { 'token':perfilAtual.token }
+    };
     //recueprar estoque da API passando Envio, colocar nesse array
-    const Estoque =[
-        {
-            idEstoque: 1,
-            tipoAnimal: "Bovino",
-            quantidade: 3
-        },
-        {
-            idEstoque: 2,
-            tipoAnimal: "Suino",
-            quantidade: 2
-        },
-        {
-            idEstoque: 3,
-            tipoAnimal: "Caprino",
-            quantidade: 5
+    React.useEffect(() =>{
+        callBD = async () =>{
+            let response = await axios.get(`${URLBase}/estoque/idc/${perfilAtual.idCliente}`,config) 
+            response = response.data
+            let list = [] 
+            response.forEach(element => {
+                a = {
+                    idEstoque: element[0],
+                    idCliente: element[1],
+                    tipoAnimal: element[2],
+                    quantidade: element[3]
+                }
+                list.push(a)
+            });
+            response = await axios.get(`${URLBase}/tipoAnimais`, config) 
+            response = response.data
+            list2 = []
+            response.forEach(element => {
+                a = {
+                    idAnimal: element[0],
+                    nomeEspecie: element[1]
+                }
+                list2.push(a)
+            })
+            setTipoAni(list2)
+            setEstoque(list)
+            setBdLoaded(true)
         }
+        if(BdLoaded==false){callBD()} 
+    })
 
-    ]
+    retAni = (id) =>{
+        tipoAni.forEach(element => {
+            if (element["idAnimal"]==id){
+                a = element["nomeEspecie"]
+                return a
+            }
+
+        });
+        return a
+    }
+
     return (
         <View>
             <View>
@@ -43,7 +74,7 @@ const ConsulEst = () =>{
                         {Estoque.map((Estoque)=>{
                             return (
                                 <DataTable.Row key={Estoque.idEstoque}>
-                                    <DataTable.Cell>{Estoque.tipoAnimal}</DataTable.Cell>
+                                    <DataTable.Cell>{retAni(Estoque.tipoAnimal)}</DataTable.Cell>
                                     <DataTable.Cell numeric>{Estoque.quantidade}</DataTable.Cell>
                                 </DataTable.Row>
                             )})}   
@@ -54,7 +85,7 @@ const ConsulEst = () =>{
                 mode="contained-tonal"
                 title="Novo Pedido"
                 icon="plus"
-                onPress={()=> Navigation.navigate("NovoPedido")}>Novo Pedido</Button>
+                onPress={()=> Navigation.navigate("NovoPedido",perfilAtual)}>Novo Pedido</Button>
             </View>
         </View>
     )

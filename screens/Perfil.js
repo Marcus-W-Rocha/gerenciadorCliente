@@ -10,6 +10,7 @@ import { PaperProvider, Text, List } from "react-native-paper";
 const Perfil = () =>{
     const Navigation = useNavigation();
     const perfilAtual = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]
+    const perfilAtual1 = {"contatoRepre": "86995157777", "idCliente": 3, "nomeEmpresa": "empresa1", "nomeRepresentante": "Representante1", "token": "dc0a90f8-a0df-51bb-91ee-e5f3f6853747", "user": "Username1"}
     return (
         <View style={{ height:"100%" }}>
             <View style={{ height:"40%", backgroundColor: "black", borderBottomLeftRadius: 20,borderBottomRightRadius: 20, 

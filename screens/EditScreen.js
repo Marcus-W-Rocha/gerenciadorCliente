@@ -2,58 +2,109 @@ import React, { useState } from "react";
 import { View, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text,Button, DataTable, TextInput, Modal, List, Portal} from "react-native-paper";
+import {URLBase} from "../const";
+import axios from "axios";
 
 
 
 const EditScreen = () =>{ 
     const Navigation = useNavigation();
+    const [listEspecies,setListEspecies] = React.useState([])
+    const [Estoque,setEstoque] = React.useState([])
+    const [bdLoaded,setBdLoaded] = React.useState(false)
     const Pedido = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["detalhes"]
+    const perfilAtual = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]
+    const config = {
+        headers: { 'token':perfilAtual.token }
+    };
+    
     const [PedidoEdit,setPedidoEdit] = React.useState(Pedido)
     const [visible, setVisible] = React.useState(false);
 
-    //recuperar estoque do banco de dados de acordo com o idCliente Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]
-    const Estoque =[
-        {
-            idEstoque: 1,
-            tipoAnimal: "Bovino",
-            quantidade: 3
-        },
-        {
-            idEstoque: 2,
-            tipoAnimal: "Suino",
-            quantidade: 2
-        },
-        {
-            idEstoque: 3,
-            tipoAnimal: "Ovino",
-            quantidade: 5
-        },
-        {
-            idEstoque: 4,
-            tipoAnimal: "Caprino",
-            quantidade: 15
-        },
-        {
-            idEstoque: 5,
-            tipoAnimal: "Aviario",
-            quantidade: 144
+    React.useEffect(() =>{
+        callbd = async () => {
+            let response = await axios.get(`${URLBase}/estoque/idc/${perfilAtual.idCliente}`, config)
+            response = response.data
+            let list = []
+            response.forEach(element => {
+                list.push({
+                    idEstoque: element[0],
+                    idCliente: element[1],
+                    tipoAnimal: element[2],
+                    quantidade: element[3]
+                })
+            });
+            response = await axios.get(`${URLBase}/tipoAnimais`, config) 
+            response = response.data
+            list2 = []
+            response.forEach(element => {
+                a = {
+                    idAnimal: element[0],
+                    nomeEspecie: element[1]
+                }
+                list2.push(a)
+            });
+            setBdLoaded(true)
+            setListEspecies(list2)
+            setEstoque(list)
         }
-
-    ]
+        if (bdLoaded == false) {callbd()}
+    })
+    
     const tipoUsados = PedidoEdit.map((pedido)=>{
             return pedido.tipoAnimal
     })
 
-    const confirmar = () => {
+    const confirmar = async () => {
+        listUpdate = [] 
+        listAdd = []
         PedidoEdit.map((pedido)=>{
-            const Enviar = {
-                idPedido: pedido.idPedido,
-                idTipoAnimal: pedido.tipoAnimal,
-                quantidade: pedido.quantidade
+            if(pedido["idDetalhe"]!= "novo"){
+                listUpdate.push({
+                    idDetalhe: pedido.idDetalhe,
+                    idPedido: pedido.idPedido,
+                    idTipoAnimal: pedido.tipoAnimal,
+                    quantidade: pedido.quantidade
+                    })
             }
-            //enviar junto com pedido.idDetalhes para update.
+            else{
+                listAdd.push({
+                    idPedido: pedido.idPedido,
+                    idTipoAnimal: pedido.tipoAnimal,
+                    quantidade: pedido.quantidade
+                })
+            }
         })
-        Navigation.goBack()
+        listAdd = listAdd.filter((element) => element.quantidade !==0)
+        if(listAdd.length>0){
+            console.log(listAdd)
+            let response = await axios.post(`${URLBase}/detalhesPedido/`,listAdd,config)
+            response = response.data
+            console.log(response)
+            
+        }
+        listDelete = listUpdate.filter((element) => element.quantidade ==0)
+        for (a=0; a<listUpdate.length;a++){
+            let response = await axios.put(`${URLBase}/detalhesPedido/idd/${listUpdate[a]["idDetalhe"]}`,listUpdate[a],config)
+            response = response.data
+        }
+        Navigation.navigate("Perfil",perfilAtual)
+    }
+
+    const retIdAni = (id) =>{
+        result = null
+        listEspecies.forEach(element => {
+            if (element["idAnimal"]==id){
+                result = element["nomeEspecie"]
+                return
+            }
+        });
+        return result
+    }
+    const deletar = async (DetPedido) =>{
+        console.log(DetPedido)
+        let response = await axios.delete(`${URLBase}/detalhesPedido/idd/${DetPedido["idDetalhe"]}`,config)
+        response = response.data
     }
 
     return (
@@ -71,7 +122,7 @@ const EditScreen = () =>{
                 {PedidoEdit.map((DetPedido,index) => {
                     return(
                         <DataTable.Row key={DetPedido.idDetalhe}>
-                            <DataTable.Cell>{DetPedido.tipoAnimal}</DataTable.Cell>
+                            <DataTable.Cell>{retIdAni(DetPedido.tipoAnimal)}</DataTable.Cell>
                             <DataTable.Cell numeric><TextInput keyboardType = "number-pad" placeholder={String(DetPedido.quantidade)} mode="outlined" onChangeText={quant=>{
                                 quant = Number(quant)
                                 Estoque.map((est) => {
@@ -105,6 +156,7 @@ const EditScreen = () =>{
                                     [
                                       { text: 'Cancelar', style: 'cancel' },
                                       { text: 'Sim', onPress: () =>{
+                                        deletar(DetPedido)
                                         const newPedidoEdit = PedidoEdit.filter((pedido) => pedido.idDetalhe !==DetPedido.idDetalhe)
                                         setPedidoEdit(newPedidoEdit)
                                       } }
@@ -124,21 +176,15 @@ const EditScreen = () =>{
                 <Modal visible={visible} onDismiss={()=> setVisible(false)} contentContainerStyle={{backgroundColor: 'white', padding: 20}}>
                     {Estoque.filter((est)=> !tipoUsados.includes(est.tipoAnimal)).map((teste)=>{
                         return(
-                            <List.Item key={teste.idEstoque} title={teste.tipoAnimal} onPress={()=>{
+                            <List.Item key={teste.idEstoque} title={retIdAni(teste.tipoAnimal)} onPress={()=>{
                                 const newPedidoEdit = PedidoEdit
-                                newPedidoEdit.push({//provisorio
-                                    idDetalhe: PedidoEdit.length+1,
+                                newPedidoEdit.push({
+                                    idDetalhe: "novo",
                                     idPedido: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["detalhes"][0]["idPedido"],
                                     quantidade: 0,
                                     tipoAnimal: teste.tipoAnimal
                                 })
-                                console.log(newPedidoEdit)
-                                //setPedidoEdit(newPedidoEdit)
-                                const envio = {//envia para a API um novo detalhe, o valor de pedido deve ser entao editado, 
-                                    //para isso todas as outras mudanças devem ser enviadas
-                                    idPedido: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["detalhes"][0]["idPedido"],
-                                    quant: 0
-                                }
+                                setPedidoEdit(newPedidoEdit)
                                 setVisible(false)
                             }}/>
                         )})}     

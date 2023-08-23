@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { View, StyleSheet,FlatList, TouchableOpacity} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider,Text,List, Portal,Modal,Button, DataTable } from "react-native-paper";
+import axios from "axios";
+import {URLBase} from "../const"
 
 
 
@@ -12,117 +14,123 @@ const ListaPedidos = () =>{
     const [visible, setVisible] = React.useState(false);
     const [visibleButton,setVisibleButton] = React.useState(false);
     const [idPedido,setIdPedido] = React.useState(null)
-    const [detalhesPedido,setDetalhesPedido] = React.useState([
-            {
-                idDetalhe: 1,
-                idPedido: 1,
-                tipoAnimal: "Bovino",
-                quantidade: 3,
+    const [bdLoaded,setBdLoaded] = React.useState(false)
+    const perfilAtual = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["perfil"]
+    const typeRequest = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["requestType"]
+    const [listPedidos,setListPedidos] = React.useState([])
+    const [detalhesPedido,setDetalhesPedido] = React.useState([])
+    const [listEspecies,setListEspecies] = React.useState([])
+    const config = {
+        headers: { 'token':perfilAtual.token }
+    };
     
-            },
-            {
-                idDetalhe: 2,
-                idPedido: 1,
-                tipoAnimal: "Ovino",
-                quantidade: 4,
-    
-            },
-            {
-                idDetalhe: 3,
-                idPedido: 1,
-                tipoAnimal: "Suino",
-                quantidade: 1,
-    
-            },
-            {
-                idDetalhe: 4,
-                idPedido: 2,
-                tipoAnimal: "Bovino",
-                quantidade: 1,
-    
-            },
-            {
-                idDetalhe: 5,
-                idPedido: 2,
-                tipoAnimal: "Ovino",
-                quantidade: 2,
-    
-            },
-            {
-                idDetalhe: 6,
-                idPedido: 3,
-                tipoAnimal: "Ovino",
-                quantidade: 12,
-    
-            },
-    
-        ])
-    const listPedidos = [//recupera banco de dados de acordo com o cliente e o dado passado pela tela anterior e coloca nesse vetor 
-        {
-            id: 1,
-            idCliente: 1,
-            dataPedido: "13/08/2022",
-            status: "Enviado",
 
-        },
-        {
-            id: 2,
-            idCliente: 1,
-            dataPedido: "14/08/2022",
-            status: "Processado",
+    React.useEffect(() => {
+        callbd = async () =>{
+            list = [] 
+            if (typeRequest.hasOwnProperty("Geral")){
+                let response = await axios.get(`${URLBase}/pedidos/idc/${perfilAtual.idCliente}`,config)
+                response = response.data
+                response.forEach(element => {
+                    date = new Date(element[2]*1000).toLocaleDateString("pt-br")
+                    a = {
+                        id: element[0],
+                        idCliente: element[1],
+                        dataPedido: date,
+                        status: element[3],
+                    }
+                    list.push(a)
+                });
+            }
+            if (typeRequest.hasOwnProperty("Status")){
+                let response = await axios.post(`${URLBase}/pedidos/status/${typeRequest["Status"]["valor"]}`,{idCliente: perfilAtual.idCliente},config)
+                response = response.data
+                response.forEach(element => {
+                    date = new Date(element[2]*1000).toLocaleDateString("pt-br")
+                    a = {
+                        id: element[0],
+                        idCliente: element[1],
+                        dataPedido: date,
+                        status: element[3],
+                    }
+                    list.push(a)
+                });
+            }
+            if (typeRequest.hasOwnProperty("Data")){
+                data_ini = new Date(typeRequest["Data"]["startDate"])
+                ini_Year = data_ini.getFullYear()
+                ini_month = data_ini.getMonth()+1
+                ini_day = data_ini.getDate()
+                if (ini_day<10){
+                    ini_day = "0"+ini_day
+                }
+                if (ini_month<10){
+                    ini_month = "0"+ini_month
+                }
+                data_ini = ini_Year+"-"+ini_month+"-"+ini_day
+                
+                data_end = new Date(typeRequest["Data"]["endDate"])
+                end_Year = data_end.getFullYear()
+                end_month = data_end.getMonth()+1
+                end_day = data_end.getDate()
+                if (end_day<10){
+                    end_day = "0"+end_day
+                }
+                if (end_month<10){
+                    end_month = "0"+end_month
+                }
+                data_end = end_Year+"-"+end_month+"-"+end_day
 
-        },
-        {
-            id: 3,
-            idCliente: 1,
-            dataPedido: "15/08/2022",
-            status: "Cancelado",
-
+                let response = await axios.post(`${URLBase}/pedidos/date/byPeriod/${perfilAtual.idCliente}`,{start:data_ini ,end:data_end},config)
+                response = response.data
+                response.forEach(element => {
+                    date = new Date(element[2]*1000).toLocaleDateString("pt-br")
+                    a = {
+                        id: element[0],
+                        idCliente: element[1],
+                        dataPedido: date,
+                        status: element[3],
+                    }
+                    list.push(a)
+                });
+            }
+            let response = await axios.get(`${URLBase}/tipoAnimais`, config) 
+            response = response.data
+            list2 = []
+            response.forEach(element => {
+                a = {
+                    idAnimal: element[0],
+                    nomeEspecie: element[1]
+                }
+                list2.push(a)
+            });
+            setBdLoaded(true)
+            setListEspecies(list2)
+            setListPedidos(list)
         }
-    ]
+        if (bdLoaded == false) {callbd()}
+
+    })
     
-    if (Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["requestType"].hasOwnProperty('status')){
-        const Envio = {
-            idCliente: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["perfil"]["idCliente"],
-            status: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["requestType"]["status"]["valor"]
-        }
-        //faz chamada pro banco de dados passando o idCliente e status, respota q sera colocada em listPedidos
-    }
-    if (Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["requestType"].hasOwnProperty('data')){
-        a = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["requestType"]["data"]["startDate"]
-        b = Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["requestType"]["data"]["endDate"]
-        bday = b.getDate()
-        bmonth = b.getMonth()+1
-        byear = b.getFullYear()
-        if (bday<10){
-            bday = "0"+bday
-            }
-        if (bmonth<10){
-            bmonth = "0"+bmonth
-            }
-        aday = a.getDate()
-        amonth = a.getMonth()+1
-        ayear = a.getFullYear()
-        if (aday<10){
-            aday = "0"+aday
-            }
-        if (amonth<10){
-            amonth = "0"+amonth
-            }
-        const Envio = {
-            idCliente: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["perfil"]["idCliente"],
-            dataInicio: `${amonth}-${aday}-${ayear}`,
-            dataFim: `${bmonth}-${bday}-${byear}`,
-        }
-        console.log(Envio)//enviar para banco de dados e esperar respota q sera colocada em listPedidos
-    }
-    const detalhes = (listPedidos) => {
+    const detalhes = async (listPedidos) => {
         if(listPedidos.status == "Processado"){
-            Navigation.navigate("DetAbate",listPedidos.id)
+            Navigation.navigate("DetAbate",{Perfil: perfilAtual,Pedidos: listPedidos.id})
         }
         else if (listPedidos.status == "Enviado"){
             setIdPedido(listPedidos.id)
-            //detalhesPedidos = detalhes do pedido do banco de dados recebidos atrazer de requisição passando o id do pedido
+            let response = await axios.get(`${URLBase}/detalhesPedido/idp/${listPedidos.id}`,config)
+            response = response.data
+            let list = []
+            response.forEach(element => {
+                a = {
+                    idDetalhe: element[0],
+                    idPedido: element[1],
+                    tipoAnimal: element[2],
+                    quantidade: element[3],
+                }
+                list.push(a)
+            });
+            setDetalhesPedido(list)
             setVisibleButton(true)
             showModalDetalhes()
 
@@ -135,13 +143,20 @@ const ListaPedidos = () =>{
 
         }
     }
-    if (Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["requestType"].hasOwnProperty('Geral')){
-        // Envia request somente com o id do cliente, que esta em Navigation.getState()
-        // ["routes"][Navigation.getState()["index"]]["params"]["perfil"]["idCliente"]
-        //respota q sera colocada em listPedidos
+    const retIdAni = (id) =>{
+        result = null
+        listEspecies.forEach(element => {
+            if (element["idAnimal"]==id){
+                result = element["nomeEspecie"]
+                return
+            }
+        });
+        return result
     }
+
     return (
         <View>
+            
             <View style={{marginTop:10 }}>
                 <Text variant="headlineMedium" 
                 style={{textAlign:'center'}}>Lista de Pedidos</Text>
@@ -169,14 +184,14 @@ const ListaPedidos = () =>{
                             {detalhesPedido.filter((pedido)=> pedido.idPedido==idPedido).map((detalhesPedido)=>{ 
                                 return (
                                     <DataTable.Row key={detalhesPedido.idDetalhe}>
-                                        <DataTable.Cell>{detalhesPedido.tipoAnimal}</DataTable.Cell>
+                                        <DataTable.Cell>{retIdAni(detalhesPedido.tipoAnimal)}</DataTable.Cell>
                                         <DataTable.Cell numeric>{detalhesPedido.quantidade}</DataTable.Cell>
                                     </DataTable.Row>
                                 )})} 
                     </DataTable>
                     {visibleButton && <Button icon="note-edit" mode="contained-tonal" onPress={() => Navigation.navigate("EditScreen",{
                                                 detalhes: detalhesPedido.filter((pedido)=> pedido.idPedido==idPedido),
-                                                idCliente: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]["idCliente"]})}>Editar Pedido</Button>}
+                                                idCliente: perfilAtual})}>Editar Pedido</Button>}
                 </Modal>
             </Portal>
         </View>
