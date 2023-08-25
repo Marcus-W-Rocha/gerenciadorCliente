@@ -77,10 +77,8 @@ const EditScreen = () =>{
         })
         listAdd = listAdd.filter((element) => element.quantidade !==0)
         if(listAdd.length>0){
-            console.log(listAdd)
             let response = await axios.post(`${URLBase}/detalhesPedido/`,listAdd,config)
             response = response.data
-            console.log(response)
             
         }
         listDelete = listUpdate.filter((element) => element.quantidade ==0)
@@ -102,7 +100,6 @@ const EditScreen = () =>{
         return result
     }
     const deletar = async (DetPedido) =>{
-        console.log(DetPedido)
         let response = await axios.delete(`${URLBase}/detalhesPedido/idd/${DetPedido["idDetalhe"]}`,config)
         response = response.data
     }
@@ -174,6 +171,8 @@ const EditScreen = () =>{
             <Button mode='contained-tonal' icon={"check-all"} onPress={()=>confirmar()}>Confirmar Edição</Button>
             <Portal>
                 <Modal visible={visible} onDismiss={()=> setVisible(false)} contentContainerStyle={{backgroundColor: 'white', padding: 20}}>
+                    <Text style={{textAlign:"center"}}>Especies Disponiveis</Text>
+                    <View style={{ height:"2%", backgroundColor: "black",marginTop:10 }}/>
                     {Estoque.filter((est)=> !tipoUsados.includes(est.tipoAnimal)).map((teste)=>{
                         return(
                             <List.Item key={teste.idEstoque} title={retIdAni(teste.tipoAnimal)} onPress={()=>{

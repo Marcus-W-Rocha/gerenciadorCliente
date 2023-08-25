@@ -57,30 +57,9 @@ const ListaPedidos = () =>{
                 });
             }
             if (typeRequest.hasOwnProperty("Data")){
-                data_ini = new Date(typeRequest["Data"]["startDate"])
-                ini_Year = data_ini.getFullYear()
-                ini_month = data_ini.getMonth()+1
-                ini_day = data_ini.getDate()
-                if (ini_day<10){
-                    ini_day = "0"+ini_day
-                }
-                if (ini_month<10){
-                    ini_month = "0"+ini_month
-                }
-                data_ini = ini_Year+"-"+ini_month+"-"+ini_day
-                
-                data_end = new Date(typeRequest["Data"]["endDate"])
-                end_Year = data_end.getFullYear()
-                end_month = data_end.getMonth()+1
-                end_day = data_end.getDate()
-                if (end_day<10){
-                    end_day = "0"+end_day
-                }
-                if (end_month<10){
-                    end_month = "0"+end_month
-                }
-                data_end = end_Year+"-"+end_month+"-"+end_day
-
+                data_ini = typeRequest["Data"]["data_ini"]
+                data_end = typeRequest["Data"]["data_end"]
+    
                 let response = await axios.post(`${URLBase}/pedidos/date/byPeriod/${perfilAtual.idCliente}`,{start:data_ini ,end:data_end},config)
                 response = response.data
                 response.forEach(element => {
@@ -137,6 +116,19 @@ const ListaPedidos = () =>{
         }
         else{
             setIdPedido(listPedidos.id)
+            let response = await axios.get(`${URLBase}/detalhesPedido/idp/${listPedidos.id}`,config)
+            response = response.data
+            let list = []
+            response.forEach(element => {
+                a = {
+                    idDetalhe: element[0],
+                    idPedido: element[1],
+                    tipoAnimal: element[2],
+                    quantidade: element[3],
+                }
+                list.push(a)
+            });
+            setDetalhesPedido(list)
             setVisibleButton(false)
             showModalDetalhes()
             

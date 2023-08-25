@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet} from 'react-native';
+import { StyleSheet, LogBox} from 'react-native';
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -15,7 +15,8 @@ import DetAbate from './screens/DetAbate';
 import EditScreen from './screens/EditScreen';
 import { pt, registerTranslation } from 'react-native-paper-dates'
 import md5 from 'md5';
-registerTranslation("pt",pt)
+LogBox.ignoreLogs(['Warning: ...'])
+LogBox.ignoreAllLogs()
 
 const Stack = createNativeStackNavigator();
 
@@ -24,16 +25,16 @@ export default function App() {
   return (
     <NavigationContainer>
     <Stack.Navigator initialRouteName='Login'>
-      <Stack.Screen name = "Login" component={Login}/>
-      <Stack.Screen name = "Perfil" component={Perfil}/>
-      <Stack.Screen name = "NovoPedido" component={NovoPedido}/>
-      <Stack.Screen name = "EditPerfil" component={EditPerfil}/>
-      <Stack.Screen name = "EditPedido" component={EditPedido}/>
-      <Stack.Screen name = "ConsulEst" component={ConsulEst}/>
-      <Stack.Screen name = "Relat" component={Relat}/>
-      <Stack.Screen name = "ListaPedidos" component={ListaPedidos}/>
-      <Stack.Screen name = "DetAbate" component={DetAbate}/>
-      <Stack.Screen name = "EditScreen" component={EditScreen}/>
+      <Stack.Screen options={{headerTitle:""}} name = "Login" component={Login}/>
+      <Stack.Screen options={{headerTitle:""}} name = "Perfil" component={Perfil}/>
+      <Stack.Screen options={{headerTitle:""}} name = "NovoPedido" component={NovoPedido}/>
+      <Stack.Screen options={{headerTitle:""}} name = "EditPerfil" component={EditPerfil}/>
+      <Stack.Screen options={{headerTitle:""}} name = "EditPedido" component={EditPedido}/>
+      <Stack.Screen options={{headerTitle:""}} name = "ConsulEst" component={ConsulEst}/>
+      <Stack.Screen options={{headerTitle:""}} name = "Relat" component={Relat}/>
+      <Stack.Screen options={{headerTitle:""}} name = "ListaPedidos" component={ListaPedidos}/>
+      <Stack.Screen options={{headerTitle:""}} name = "DetAbate" component={DetAbate}/>
+      <Stack.Screen options={{headerTitle:""}} name = "EditScreen" component={EditScreen}/>
     </Stack.Navigator>
     </NavigationContainer>
   );

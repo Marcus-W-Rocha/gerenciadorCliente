@@ -37,10 +37,34 @@ const Relat = () =>{
     
       const onConfirm = React.useCallback(
         ({ startDate, endDate }) => {
-          setOpen(false);
-          setRange({ startDate, endDate });
-          Navigation.navigate("ListaPedidos",{requestType:{Data:{ startDate, endDate} }, 
-          perfil:Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]})
+            setOpen(false);
+            setRange({ startDate, endDate });
+            ini_year = startDate.getFullYear()
+            ini_month = startDate.getMonth() + 1
+            ini_day = startDate.getDate()
+            if (ini_day < 10) {
+                ini_day = "0" + ini_day
+            }
+            if (ini_month < 10) {
+                ini_month = "0" + ini_month
+            }
+            data_ini = ini_year + "-" + ini_month + "-" + ini_day
+
+            end_year = endDate.getFullYear()
+            end_month = endDate.getMonth()+1
+            end_day = endDate.getDate()
+            if (end_day<10){
+                end_day = "0"+end_day
+            }
+            if (end_month<10){
+                end_month = "0"+end_month
+            }
+            data_end = end_year+"-"+end_month+"-"+end_day
+
+            Navigation.navigate("ListaPedidos", {
+                requestType: { Data: { data_ini, data_end } },
+                perfil: Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]
+            })
         },
         [setOpen, setRange]
       );
@@ -74,7 +98,7 @@ const Relat = () =>{
                     perfil:Navigation.getState()["routes"][Navigation.getState()["index"]]["params"]})}/>
             </View>
             <DatePickerModal
-            locale="pt"
+            locale="en"
             mode="range"
             visible={open}
             onDismiss={onDismiss}

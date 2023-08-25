@@ -30,7 +30,7 @@ const DetAbate = () =>{
                     idPedidos: element[1],
                     TipoAnimal: element[2],
                     peso: element[3],
-                    condenações: element[4],
+                    condenacoes: element[4],
                 }
                 list.push(a)
             });
@@ -62,6 +62,27 @@ const DetAbate = () =>{
         });
         return a
     }
+
+    const retPesoHigh = (peso, condenacoes) =>{
+        viavel = peso.split(",")
+        condenado = condenacoes.split(",")
+        if (condenado[0] == "0"){
+            condenado.pop()
+        }
+        if (viavel[0] == "0"){
+            viavel.pop()
+        }
+        return <Text>{viavel.toString()}{(viavel.length>0 && condenado.length>0) ? <Text>,</Text>: ""}{condenado.length>0 ? <Text style={{color: 'red'}}>{condenado.toString()}</Text>: ""}</Text>
+    }
+
+    const retNumCond = (condenacoes) =>{
+        condenacoesList = condenacoes.split(",")
+        if (condenacoesList[0] == "0"){
+            condenacoesList.pop()
+        }
+        return condenacoesList.length
+    } 
+
     return (
         <View>
             <View style={{marginTop:10 }}>
@@ -79,8 +100,8 @@ const DetAbate = () =>{
                                 return (
                                     <DataTable.Row key={listAbates.idAbate}>
                                         <DataTable.Cell>{retIdAni(listAbates.TipoAnimal)}</DataTable.Cell>
-                                        <DataTable.Cell numeric>{listAbates.peso}</DataTable.Cell>
-                                        <DataTable.Cell numeric>{listAbates.condenações}</DataTable.Cell>
+                                        <DataTable.Cell numeric>{retPesoHigh(listAbates.peso,listAbates.condenacoes)}</DataTable.Cell>
+                                        <DataTable.Cell numeric>{retNumCond(listAbates.condenacoes)}</DataTable.Cell>
                                     </DataTable.Row>
                                 )})}   
                     </DataTable>
