@@ -3,7 +3,6 @@ import { View,  } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PaperProvider, Text, List } from "react-native-paper";
 
-//perfil atual recuperado do banco de dados
 
 
 

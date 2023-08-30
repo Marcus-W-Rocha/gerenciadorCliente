@@ -68,9 +68,7 @@ const EditPerfil = () =>{
             <View>
                 <TextInput label={"Nome Representante"}  value={represent} onChangeText={represent => setRepresent(represent)}/>
                 {(represent.length>0 && represent.length<=5) && <HelperText type="error" visible={true}>Nome Representante Invalido</HelperText>}
-                <TextInput keyboardType='phone-pad' label={"Contato Representante"}  value={contato} onChangeText={contato => setContato(contato)}/>
-                {vericLetras(contato)&&<HelperText type="error" visible= {true}>Caracter Invalido</HelperText>}
-                {(contato.length!=0 && contato.length!=11) && <HelperText type="error" visible= {true}>Numero Invalido</HelperText>}
+                <TextInput keyboardType='text' label={"Contato Representante"}  value={contato} onChangeText={contato => setContato(contato)}/>
                 <TextInput 
                 label={"Nova Senha"} 
                 value={valueSenha} 

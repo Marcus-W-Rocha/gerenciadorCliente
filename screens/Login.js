@@ -25,6 +25,7 @@ const Login =() => {
             senha:md5(valueSenha)
         }
         const response = await axios.post(`${URLBase}/clientes/login`,log)
+        console.log(response.data)
        if (response.data != "Credenciais Invalidas"){
             const PerfilAtual = {
                 idCliente: response.data[0],
@@ -32,7 +33,8 @@ const Login =() => {
                 nomeRepresentante: response.data[2],
                 contatoRepre: response.data[3],
                 user: response.data[4],
-                token: response.data[5]
+                accType:response.data[5],
+                token: response.data[6]
             }
             Navigation.navigate("Perfil",PerfilAtual)
        }       
